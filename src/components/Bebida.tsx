@@ -3,16 +3,20 @@ import useBebidas from "../hooks/useBebidas";   //hook personalizado
 
 type BebidaType = {         //define el tipo de Bebida, dentro están los atributos de bebida
     idDrink: string;
-    strDrink: string;
-    strDrinkThumb:string;
+    strDrink?: string;
+    strDrinkThumb?:string;
 }
 type BebidaProps = {        //define el tipo de los props
     bebida: BebidaType;
 }
 
 const Bebida = ({bebida}: BebidaProps) => {    //extrae el prop bebida con el tipo definido en BebidaProps
+    const context =useBebidas();    //asegurar que el context no sea undefined
+    if(!context){
+        return null;
+    }
 
-    const {handleModalClick, handleBebidaIdClick} = useBebidas();   //se extrae la funcion del BebidasProvider
+    const {handleModalClick, handleBebidaIdClick} = context;   //se extrae la funcion del BebidasProvider
 
     return (
         <Col md={6} lg={3} className="mt-2">

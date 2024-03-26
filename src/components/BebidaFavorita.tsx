@@ -4,17 +4,20 @@ import React from "react"
 
 type RecetaFavoritaType = {
   idDrink: string;
-  strDrink: string;
-  strDrinkThumb: string;
-  strInstructions: string;
-}
+  strDrink?: string;
+  strDrinkThumb?: string;
+  strInstructions?: string;
+};
 type RecetaFavoritaProps = {
-  recetaFavorita: RecetaFavoritaType
-}
+  recetaFavorita: RecetaFavoritaType;
+};
 
 const BebidaFavorita = ({recetaFavorita}: RecetaFavoritaProps) => {
-
-  const {handleEliminarFavorito} = useBebidas();
+  const context =useBebidas();    //asegurar que el context no sea undefined
+  if(!context){
+      return null;
+  }
+  const {handleEliminarFavorito} = context;
   
   const [isLoading, setLoading] = React.useState(false);
   React.useEffect(() => {
@@ -27,18 +30,26 @@ const BebidaFavorita = ({recetaFavorita}: RecetaFavoritaProps) => {
 
   const mostrarIngredientes = () => {
     let ingredientes = [];                                      //arreglo vacío de ingredientes
+    let string1:string= 'strIngredient';                        //string para buscar ingredientes y medidas
+    let string2:string= 'strMeasure';
+    var arreglo = [];                                           //arreglo para guardar los valores de receta
 
-    for(let i = 1; i < 16; i++){                                //inicializa el iterador
-      if(recetaFavorita[`strIngredient${i}`]){                           //revisa que el key sea válido (no tenga un null) del atributo strIngredients
-        ingredientes.push(                                      //agrega a ingredientes el html que sigue
-          <li key={i}>{recetaFavorita[`strIngredient${i}`]}: {recetaFavorita[`strMeasure${i}`]}</li>  //imprime el ingrediente y su medida
-        )
-      }
+    for ( const par of Object.entries(recetaFavorita)){             //extrae todos los elementos de receta como pares en un array de arrays
+      arreglo.push(par);
+    }
+    const arreglo1 = arreglo.filter(elemento => elemento[0].includes(string1) && elemento[1] !== null);//filtra por string y nulos
+    const arreglo2 = arreglo.filter(elemento => elemento[0].includes(string2) && elemento[1] !== null);
+
+    for(let i = 0; i < arreglo1.length; i++){ //itera para crear la lista de ingredientes
+      ingredientes.push(
+        <li>{arreglo1[i][1]}: {arreglo2[i][1]}</li>
+      )
     }
    
     return ingredientes;
   }
 
+  const idRecetaEliminada = recetaFavorita.idDrink ?? "";
   return (
     <Card className="mt-2">
       <Card.Img
@@ -59,7 +70,7 @@ const BebidaFavorita = ({recetaFavorita}: RecetaFavoritaProps) => {
       <Button
         onClick={() => {
           setLoading(true)
-          handleEliminarFavorito(recetaFavorita.idDrink)}}
+          handleEliminarFavorito(idRecetaEliminada)}}
         className="w-100 text-uppercase mb-2"
         variant="danger"
       >

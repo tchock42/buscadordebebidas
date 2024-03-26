@@ -3,31 +3,36 @@ import axios from "axios";
 
 type Bebida = { 
     //aqui van los tipos de los atributos de bebidas
-    idDrink: string;
-}
+    idDrink: string;     
+};
 type Datos = {          //parámetros que toma la funcion consultarBebida
     nombre: string;
     categoria: string;
-}
-type ID = {
-    //aqui van los tipos de los atributos de bebidas
-}
+};
+// type ID = {
+//     //aqui van los tipos de los atributos de bebidas
+// };
 type IDRecetaFav = {
-
-}
-type RecetasFavoritas = {
     
-}
+};
+type RecetasFavoritas = {
+    idDrink: string;
+};
 type IDRecetaEliminada = {
     
-}
+};
 type MyContextType = {                      //interfaz del tipado el valor del context
     bebidas: Bebida[];
     consultarBebida: (datos: Datos) => Promise<void>;    //toma como argumento de tipo Datos y retorna una promesa de tipo void
     handleModalClick: () => void;                           //toma como argumento nada y retorna nada
     modal: boolean;
-    handleBebidaIdClick: (id: ID) => void;
-    receta: object;
+    handleBebidaIdClick: (id: React.SetStateAction<string>) => void;
+    receta: {
+        strInstructions: string;
+        idDrink: string;
+        strDrinkThumb: string;
+        strDrink: string;
+    };
     spinner: boolean;
     handleAddFavorite: (idRecetaFav: IDRecetaFav) => void;
     modalFav: boolean;
@@ -36,9 +41,9 @@ type MyContextType = {                      //interfaz del tipado el valor del c
     recetasFavoritas: RecetasFavoritas[];
     handleEliminarFavorito: (idRecetaEliminada: IDRecetaEliminada) => void;
     alerta: string;
-    setModalFav: () => void;
-    setModal: () => void;
-}
+    setModalFav: (bool: any) => void;
+    setModal: (bool: any) => void;
+};
 
 const BebidasContext = React.createContext<MyContextType | undefined>(undefined) //contexto es MyContextType o undefined con valor inicial undefined
 
@@ -50,15 +55,20 @@ const BebidasProvider = ({children}: MyProviderProps) => {   //: MyProviderProps
     
     const [bebidas, setBebidas] = useState([])      //1 inicializa el state como array vacío
     const [modal, setModal] = useState(false)       //2 modal activo
-    const [bebidaId, setBebidaId] = useState(null)  //3state de id de la bebida para consultar la receta
-    const [receta, setReceta] = useState({})        //4state que guarda la receta del modal
+    const [bebidaId, setBebidaId] = useState('')  //3state de id de la bebida para consultar la receta
+    const [receta, setReceta] = useState({
+        strInstructions: "",
+        idDrink: "",
+        strDrinkThumb: "",
+        strDrink: "",
+    })        //4state que guarda la receta del modal
     const [spinner, setSpinner] = useState(false)   //5 state que guarda state del spinner
     const [modalFav, setModalFav] = useState(false) //6state modal de favoritos
     //obtener favoritos de localStorage
     const favoritosLS = JSON.parse(localStorage.getItem('favoritos') || '""')
     const [favoritos, setFavoritos] = useState(favoritosLS)  //7 arreglo que guarda los favoritos
     const [alerta, setAlerta] = useState('');       //8 alerta de que no hay favoritos
-    const [recetasFavoritas, setRecetasFavoritas] = useState([])    //9recetas favoritas consultadas
+    const [recetasFavoritas, setRecetasFavoritas] = useState<RecetasFavoritas[]>([])    //9recetas favoritas consultadas
 
     useEffect(() => {
         localStorage.setItem('favoritos', JSON.stringify(favoritos))
@@ -73,11 +83,13 @@ const BebidasProvider = ({children}: MyProviderProps) => {   //: MyProviderProps
             return;
         }
         try {
-            const favRecetas = await Promise.all(favoritos.map( async id => {
+            
+            const favRecetas = await Promise.all(favoritos.map( async (id: any) => {
                 const url = `http://www.thecocktaildb.com/api/json/v1/1/lookup.php?i=${id}` 
                 const {data} = await axios(url);
                 return data.drinks[0];
             }));
+            console.log(favRecetas);
             setAlerta('')
             setRecetasFavoritas(favRecetas);
             // console.log(recetasFavoritas);
@@ -109,7 +121,7 @@ const BebidasProvider = ({children}: MyProviderProps) => {   //: MyProviderProps
 
     }, [bebidaId]);
 
-    const consultarBebida = async datos => {        //toma como parámetro datos que viene del formulario
+    const consultarBebida = async (datos: { nombre: any; categoria: any; }) => {        //toma como parámetro datos que viene del formulario
         try {
             const url = `https://www.thecocktaildb.com/api/json/v1/1/filter.php?i=${datos.nombre}&c=${datos.categoria}`
             const {data} = await axios(url)                 //consulta la API
@@ -128,13 +140,13 @@ const BebidasProvider = ({children}: MyProviderProps) => {   //: MyProviderProps
     }
         
     //funcion para setear el id de la bebida en el state bebidaId
-    const handleBebidaIdClick = (id) => {
+    const handleBebidaIdClick = (id: React.SetStateAction<string>) => {
 
         setBebidaId(id);
     }
 
     //funcion para agregar al LocalStorage los favoritos
-    const handleAddFavorite = (idRecetaFav) => {
+    const handleAddFavorite = (idRecetaFav: any) => {
         //revisar si el id ya está en favoritos
         if(favoritos.includes(idRecetaFav)) return;
 
@@ -148,9 +160,9 @@ const BebidasProvider = ({children}: MyProviderProps) => {   //: MyProviderProps
         setModalFav(!modalFav)
     }
     //funcion para eliminar favorito
-    const handleEliminarFavorito = (idRecetaEliminada) => {
+    const handleEliminarFavorito = (idRecetaEliminada: IDRecetaEliminada) => {
         console.log('Eliminando...', idRecetaEliminada)
-        const noEliminados = favoritos.filter(favorito => favorito !== idRecetaEliminada);
+        const noEliminados = favoritos.filter((favorito: any) => favorito !== idRecetaEliminada);
 
         setFavoritos(noEliminados)
     }

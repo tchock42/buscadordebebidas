@@ -3,7 +3,11 @@ import { Row } from "react-bootstrap";
 import Bebida from './Bebida'
 
 const ListadoBebidas = () => {
-    const { bebidas } = useBebidas();         //extrae el arreglo de bebidas
+    const context = useBebidas();
+    if(!context){
+        return null;
+    }
+    const { bebidas } = context;         //extrae el arreglo de bebidas
     // console.log(bebidas)
     return (
         <Row className="mt-5">

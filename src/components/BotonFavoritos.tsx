@@ -2,8 +2,11 @@ import { Button } from "react-bootstrap"
 import useBebidas from "../hooks/useBebidas"
 
 const BotonFavoritos = () => {
-
-    const { handleModalFav, obtenerRecetas } = useBebidas();
+    const context = useBebidas();
+    if(!context){
+        return null;
+    }
+    const { handleModalFav, obtenerRecetas } = context;
 
     return (
         <Button

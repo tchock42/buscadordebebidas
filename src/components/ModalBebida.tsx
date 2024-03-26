@@ -14,20 +14,30 @@ const ModalBebida = () => {
     }
   }, [isLoading]);
   
-  const {bebidas, handleModalClick, modal, receta, spinner, handleAddFavorite, setModal} = useBebidas();       //extrae del provider la funcion del modal, el state de modal y la receta de la API
-  // console.log(receta)
+  const context =useBebidas();    //asegurar que el context no sea undefined
+  if(!context){
+      return null;
+  }
+  const {handleModalClick, modal, receta, spinner, handleAddFavorite, setModal} = context;       //extrae del provider la funcion del modal, el state de modal y la receta de la API
 
   const mostrarIngredientes = () => {
     let ingredientes = [];                                      //arreglo vacío de ingredientes
+    let string1:string= 'strIngredient';                        //string para buscar ingredientes y medidas
+    let string2:string= 'strMeasure';
+    var arreglo = [];                                           //arreglo para guardar los valores de receta
 
-    for(let i = 1; i < 16; i++){                                //inicializa el iterador
-      if(receta[`strIngredient${i}`]){                           //revisa que el key sea válido (no tenga un null) del atributo strIngredients
-        ingredientes.push(                                      //agrega a ingredientes el html que sigue
-          <li key={i}>{receta[`strIngredient${i}`]}: {receta[`strMeasure${i}`]}</li>  //imprime el ingrediente y su medida
-        )
-      }
+    for ( const par of Object.entries(receta)){             //extrae todos los elementos de receta como pares en un array de arrays
+      arreglo.push(par);
     }
-   
+    const arreglo1 = arreglo.filter(elemento => elemento[0].includes(string1) && elemento[1] !== null);//filtra por string y nulos
+    const arreglo2 = arreglo.filter(elemento => elemento[0].includes(string2) && elemento[1] !== null);
+
+    for(let i = 0; i < arreglo1.length; i++){ //itera para crear la lista de ingredientes
+      ingredientes.push(
+        <li>{arreglo1[i][1]}: {arreglo2[i][1]}</li>
+      )
+    }
+
     return ingredientes;
   }
 
@@ -64,7 +74,7 @@ const ModalBebida = () => {
               <Button 
                 variant="secondary"
                 onClick={() => {handleClose()}}
-              >Cerrar</Button>
+              >Cerrar</Button> 
               <Button 
                 variant="primary"
                 onClick={() => {

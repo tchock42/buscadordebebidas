@@ -4,8 +4,13 @@ import useBebidas from "../hooks/useBebidas"
 import BebidaFavorita from "./BebidaFavorita"
 
 const ModalFavoritos = () => {
+
+    const context =useBebidas();    //asegurar que el context no sea undefined
+    if(!context){
+        return null;
+    }
   
-    const {modalFav, handleModalFav, spinner, recetasFavoritas, alerta, setModalFav} = useBebidas()
+    const {modalFav, handleModalFav, spinner, recetasFavoritas, alerta, setModalFav} = context;
     
     const handleClose = () => {
         setModalFav(false)

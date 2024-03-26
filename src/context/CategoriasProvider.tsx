@@ -2,7 +2,7 @@ import React from "react";
 import axios from "axios";
 
 type Categoria = {
-    
+    strCategory: string;
 }
 
 type MyContextType = {                      //interfaz del tipado el valor del context
@@ -41,7 +41,7 @@ const CategoriasProvider = ({children}: MyProviderProps) => {   //: MyProviderPr
         >
             {children}
         </CategoriasContext.Provider>
-    )
+    ) 
 }
 export {
     CategoriasProvider

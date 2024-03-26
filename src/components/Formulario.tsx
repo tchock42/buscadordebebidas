@@ -10,8 +10,19 @@ const Formulario = () => {
         categoria: ''
     })
     const [alerta, setAlerta] = useState('')                    //state para la alerta
-    const {categorias} = useCategorias();                    //extrae las categorias del Provider. useCategorias retorna un arreglo    
-    const {consultarBebida} = useBebidas();                //extrae la funcion que consulta las bebidas del Provider de Bebidas        
+    //context de Categorias
+    const context = useCategorias();
+    if(!context){
+        return null;
+    }
+    const {categorias} = context                   //extrae las categorias del Provider. useCategorias retorna un arreglo    
+
+    //context de Bebidas
+    const contexto = useBebidas();
+    if(!contexto){
+        return null;
+    }
+    const {consultarBebida} = contexto;                //extrae la funcion que consulta las bebidas del Provider de Bebidas        
 
     const handleSubmit = (e: React.FormEvent<HTMLFormElement>) => {    //funcion asociada al formulario
         e.preventDefault();
